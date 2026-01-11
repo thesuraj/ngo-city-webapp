@@ -12,11 +12,21 @@ const Header = () => {
   const navItems = [
     { path: '/', label: 'Home' },
     { path: '/events', label: 'Events' },
-      { path: '/city-history', label: 'City History' },
+    { path: '/personalities', label: 'Personalities' },
+    { 
+      path: '/places', label: 'Places To Visit',
+      submenu: [
+        { name: 'Service 1', href: '/service-1' },
+        { name: 'Service 2', href: '/service-2' },
+      ],
+    },
+    { path: '/city-history', label: 'City History' },
     { path: '/my-volunteering', label: 'My Volunteering' }
   ];
 
   const isActive = (path) => location.pathname === path;
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [openMobileSubmenuIndex, setOpenMobileSubmenuIndex] = useState(null);
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -30,24 +40,45 @@ const Header = () => {
             <div className="bg-emerald-600 p-2 rounded-lg">
               <Heart className="text-white" size={24} fill="white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">HopeConnect</span>
+            <span className="text-xl font-bold text-gray-900">My Etawah</span>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <Button
-                key={item.path}
-                variant="ghost"
-                className={`${
-                  isActive(item.path)
-                    ? 'text-emerald-600 bg-emerald-50'
-                    : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50'
-                } transition-colors`}
-                onClick={() => navigate(item.path)}
+            {navItems.map((item, idx) => (
+              <div
+                key={`${item.path}-${idx}`}
+                className="relative"
+                onMouseEnter={() => item.submenu && setOpenDropdownIndex(idx)}
+                onMouseLeave={() => item.submenu && setOpenDropdownIndex(null)}
               >
-                {item.label}
-              </Button>
+                <Button
+                  variant="ghost"
+                  className={`${
+                    isActive(item.path)
+                      ? 'text-emerald-600 bg-emerald-50'
+                      : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50'
+                  } transition-colors`}
+                  onClick={() => navigate(item.path)}
+                >
+                  {item.label}
+                </Button>
+
+                {/* {item.submenu && openDropdownIndex === idx && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                    {item.submenu.map((s, sidx) => (
+                      <button
+                        key={`${s.href}-${sidx}`}
+                        onClick={() => navigate(s.href)}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                      >
+                        {s.name}
+                      </button>
+                    ))}
+                  </div>
+                )} */}
+
+              </div>
             ))}
           </nav>
 
@@ -64,22 +95,60 @@ const Header = () => {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-2">
-              {navItems.map((item) => (
-                <Button
-                  key={item.path}
-                  variant="ghost"
-                  className={`${
-                    isActive(item.path)
-                      ? 'text-emerald-600 bg-emerald-50'
-                      : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50'
-                  } justify-start transition-colors`}
-                  onClick={() => {
-                    navigate(item.path);
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  {item.label}
-                </Button>
+              {navItems.map((item, idx) => (
+                <div key={`${item.path}-mobile-${idx}`}>
+                  {!item.submenu && (
+                    <Button
+                      variant="ghost"
+                      className={`${
+                        isActive(item.path)
+                          ? 'text-emerald-600 bg-emerald-50'
+                          : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50'
+                      } justify-start transition-colors`}
+                      onClick={() => {
+                        navigate(item.path);
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {item.label}
+                    </Button>
+                  )}
+
+                  {item.submenu && (
+                    <div>
+                      <Button
+                        variant="ghost"
+                        className={`${
+                          isActive(item.path)
+                            ? 'text-emerald-600 bg-emerald-50'
+                            : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50'
+                        } justify-between w-full transition-colors`}
+                        onClick={() => setOpenMobileSubmenuIndex(openMobileSubmenuIndex === idx ? null : idx)}
+                      >
+                        <span>{item.label}</span>
+                      </Button>
+
+                      {openMobileSubmenuIndex === idx && (
+                        <div className="pl-4 mt-1 flex flex-col">
+                          {item.submenu.map((s, sidx) => (
+                            <Button
+                              key={`${s.href}-${sidx}`}
+                              variant="ghost"
+                              className="justify-start text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+                              onClick={() => {
+                                navigate(s.href);
+                                setMobileMenuOpen(false);
+                                setOpenMobileSubmenuIndex(null);
+                              }}
+                            >
+                              {s.name}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               ))}
             </nav>
           </div>
