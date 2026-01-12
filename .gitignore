@@ -1,2 +1,14 @@
 node_modules/
 
+build 
+dist
+
+
+yarn.lock
+package-lock.json
+npm-debug.log
+.DS_Store
+.vscode/
+.env
+.idea/
+*.log
